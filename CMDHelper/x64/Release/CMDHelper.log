@@ -1,0 +1,22 @@
+﻿  CMDHelper.cpp
+C:\Users\Kevin\source\repos\CMDHelper\CMDHelper.cpp(60,100): warning C4267: 'argument': conversion from 'size_t' to 'DWORD', possible loss of data
+C:\Users\Kevin\source\repos\CMDHelper\CMDHelper.cpp(166,115): warning C4267: 'argument': conversion from 'size_t' to 'DWORD', possible loss of data
+C:\Users\Kevin\source\repos\CMDHelper\CMDHelper.cpp(167,201): warning C4267: 'argument': conversion from 'size_t' to 'DWORD', possible loss of data
+C:\Users\Kevin\source\repos\CMDHelper\CMDHelper.cpp(169,219): warning C4267: 'argument': conversion from 'size_t' to 'DWORD', possible loss of data
+C:\Users\Kevin\source\repos\CMDHelper\CMDHelper.cpp(174,113): warning C4267: 'argument': conversion from 'size_t' to 'DWORD', possible loss of data
+C:\Users\Kevin\source\repos\CMDHelper\CMDHelper.cpp(175,201): warning C4267: 'argument': conversion from 'size_t' to 'DWORD', possible loss of data
+C:\Users\Kevin\source\repos\CMDHelper\CMDHelper.cpp(177,217): warning C4267: 'argument': conversion from 'size_t' to 'DWORD', possible loss of data
+C:\Users\Kevin\source\repos\CMDHelper\CMDHelper.cpp(182,115): warning C4267: 'argument': conversion from 'size_t' to 'DWORD', possible loss of data
+C:\Users\Kevin\source\repos\CMDHelper\CMDHelper.cpp(183,201): warning C4267: 'argument': conversion from 'size_t' to 'DWORD', possible loss of data
+C:\Users\Kevin\source\repos\CMDHelper\CMDHelper.cpp(185,219): warning C4267: 'argument': conversion from 'size_t' to 'DWORD', possible loss of data
+C:\Users\Kevin\source\repos\CMDHelper\CMDHelper.cpp(189,113): warning C4267: 'argument': conversion from 'size_t' to 'DWORD', possible loss of data
+C:\Users\Kevin\source\repos\CMDHelper\CMDHelper.cpp(190,201): warning C4267: 'argument': conversion from 'size_t' to 'DWORD', possible loss of data
+C:\Users\Kevin\source\repos\CMDHelper\CMDHelper.cpp(192,217): warning C4267: 'argument': conversion from 'size_t' to 'DWORD', possible loss of data
+C:\Users\Kevin\source\repos\CMDHelper\CMDHelper.cpp(201,164): warning C4267: 'argument': conversion from 'size_t' to 'DWORD', possible loss of data
+C:\Users\Kevin\source\repos\CMDHelper\CMDHelper.cpp(202,205): warning C4267: 'argument': conversion from 'size_t' to 'DWORD', possible loss of data
+C:\Users\Kevin\source\repos\CMDHelper\CMDHelper.cpp(261,91): warning C4267: 'argument': conversion from 'size_t' to 'DWORD', possible loss of data
+  Generating code
+  Previous IPDB not found, fall back to full compilation.
+  All 189 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  CMDHelper.vcxproj -> C:\Users\Kevin\source\repos\CMDHelper\x64\Release\CMDHelper.exe
