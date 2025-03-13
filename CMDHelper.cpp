@@ -10,6 +10,8 @@
 // - Added system variables for color, default file location, and icon path.
 // - Updated registry entries to use the embedded icon from the executable.
 
+// - test - from Jeremy
+
 #include <iostream>
 #include <windows.h>
 #include <string>
