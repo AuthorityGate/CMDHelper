@@ -1,24 +1,26 @@
 # CMDHelper
 
-A lightweight Windows utility that enhances the command prompt experience with context menu integration, admin/user mode switching, and customizable color schemes.
+A lightweight Windows utility that enhances the command prompt experience with context menu integration, three distinct operating modes, and customizable color schemes.
 
 ![Windows](https://img.shields.io/badge/platform-Windows%2010%2B-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
-![Version](https://img.shields.io/badge/version-0.9-orange)
+![Version](https://img.shields.io/badge/version-1.0.0-orange)
 
 ## Features
 
 - **Right-Click Context Menu** - Open CMD in any folder directly from Windows Explorer
-- **Admin/User Mode** - Quickly switch between elevated and standard prompts
-- **Color-Coded Terminals** - Visual distinction between Admin (red) and User (green) sessions
+- **Three Operating Modes** - Admin, User, and System modes with distinct visual styles
+- **Color-Coded Terminals** - Instant visual identification of privilege level
 - **Self-Installing** - First run automatically installs and configures the utility
 - **Customizable** - Configure colors via command line or registry
 
-## Screenshots
+## Operating Modes
 
-| Admin Mode (Red) | User Mode (Green) |
-|------------------|-------------------|
-| Elevated prompt with red text | Standard prompt with green text |
+| Mode | Color | Privilege | Use Case |
+|------|-------|-----------|----------|
+| **Admin** | Red text on black | Elevated (UAC) | Administrative tasks requiring elevated privileges |
+| **User** | Green text on black | Standard | Day-to-day development and file operations |
+| **System** | Yellow text on black | Elevated (UAC) | System-level tasks, services, and maintenance |
 
 ## Installation
 
@@ -47,8 +49,9 @@ start CMDHelper.sln
 
 ### Context Menu
 After installation, right-click on any folder or folder background:
-- **AuthorityGate CMD (Admin)** - Opens elevated command prompt
-- **AuthorityGate CMD (User)** - Opens standard command prompt
+- **AuthorityGate CMD (Admin)** - Opens elevated command prompt (Red)
+- **AuthorityGate CMD (User)** - Opens standard command prompt (Green)
+- **AuthorityGate CMD (System)** - Opens elevated command prompt (Yellow)
 
 ### Command Line
 
@@ -57,8 +60,9 @@ CMDHelper.exe [options] [directory]
 
 Options:
   --help           Show help message
-  --admin          Open CMD as Administrator
-  --user           Open CMD as standard User
+  --admin          Open CMD as Administrator (Red)
+  --user           Open CMD as standard User (Green)
+  --system         Open CMD for System tasks (Yellow)
   --reinstall      Reinstall registry entries and shortcuts
   --uninstall      Remove all registry entries and shortcuts
   --set-colors     Customize terminal colors
@@ -66,12 +70,14 @@ Options:
 Examples:
   CMDHelper.exe --admin                    # Open admin prompt in default location
   CMDHelper.exe "C:\Projects" --admin      # Open admin prompt in C:\Projects
-  CMDHelper.exe --set-colors 4 A 0 0       # Red admin text, green user text, black backgrounds
+  CMDHelper.exe --system                   # Open system prompt (yellow) in default location
+  CMDHelper.exe "C:\Windows" --system      # Open system prompt in C:\Windows
+  CMDHelper.exe --set-colors 4 A E 0 0 0   # Red admin, green user, yellow system, all black backgrounds
 ```
 
 ### Color Codes
 
-Use these codes with `--set-colors <AdminText> <UserText> <AdminBg> <UserBg>`:
+Use these codes with `--set-colors <AdminText> <UserText> <SystemText> <AdminBg> <UserBg> <SystemBg>`:
 
 | Code | Color | Code | Color |
 |------|-------|------|-------|
@@ -87,6 +93,7 @@ Use these codes with `--set-colors <AdminText> <UserText> <AdminBg> <UserBg>`:
 **Default colors:**
 - Admin: Red text (4) on Black background (0)
 - User: Light Green text (A) on Black background (0)
+- System: Yellow text (E) on Black background (0)
 
 ## Installation Details
 
@@ -119,8 +126,9 @@ ie4uinit.exe -show
 Start Menu shortcuts are created in:
 ```
 Start Menu\Programs\AuthorityGate Utilities\
-├── CMDHelper (Admin).lnk
-├── CMDHelper (User).lnk
+├── CMDHelper (Admin).lnk      # Red - elevated
+├── CMDHelper (User).lnk       # Green - standard
+├── CMDHelper (System).lnk     # Yellow - elevated
 ├── CMDHelper (Reinstall).lnk
 └── CMDHelper (Uninstall).lnk
 ```
@@ -128,8 +136,10 @@ Start Menu\Programs\AuthorityGate Utilities\
 Registry entries are created at:
 - `HKEY_CLASSES_ROOT\Directory\shell\OpenCmdHereAsAdmin`
 - `HKEY_CLASSES_ROOT\Directory\shell\OpenCmdHereAsUser`
+- `HKEY_CLASSES_ROOT\Directory\shell\OpenCmdHereAsSystem`
 - `HKEY_CLASSES_ROOT\Directory\Background\shell\OpenCmdHereAsAdmin`
 - `HKEY_CLASSES_ROOT\Directory\Background\shell\OpenCmdHereAsUser`
+- `HKEY_CLASSES_ROOT\Directory\Background\shell\OpenCmdHereAsSystem`
 - `HKEY_LOCAL_MACHINE\SOFTWARE\AuthorityGate\CMDHelper`
 
 ## Uninstallation
@@ -146,8 +156,10 @@ CMDHelper.exe --uninstall
 ```batch
 reg delete "HKCR\Directory\shell\OpenCmdHereAsAdmin" /f
 reg delete "HKCR\Directory\shell\OpenCmdHereAsUser" /f
+reg delete "HKCR\Directory\shell\OpenCmdHereAsSystem" /f
 reg delete "HKCR\Directory\Background\shell\OpenCmdHereAsAdmin" /f
 reg delete "HKCR\Directory\Background\shell\OpenCmdHereAsUser" /f
+reg delete "HKCR\Directory\Background\shell\OpenCmdHereAsSystem" /f
 reg delete "HKLM\SOFTWARE\AuthorityGate\CMDHelper" /f
 ```
 
@@ -200,7 +212,10 @@ A: Currently, the installation path is hardcoded. You can modify `CMDHelper.cpp`
 A: This utility specifically launches `cmd.exe`. Windows Terminal integration would require different implementation.
 
 **Q: How do I reset to default colors?**  
-A: Run `CMDHelper.exe --set-colors 4 A 0 0`
+A: Run `CMDHelper.exe --set-colors 4 A E 0 0 0` (Red admin, Green user, Yellow system, all black backgrounds)
+
+**Q: What's the difference between Admin and System modes?**  
+A: Both run elevated (with UAC prompt), but have different colors for visual distinction. Use Admin (red) for administrative tasks and System (yellow) for system-level maintenance, services, or when you want a visual reminder you're doing system work.
 
 ## Contributing
 

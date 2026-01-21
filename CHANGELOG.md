@@ -5,14 +5,27 @@ All notable changes to CMDHelper will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.0.0] - 2025-01
 
 ### Added
+- **System Mode** - New `--system` option with yellow text on black background
+  - Context menu entry: "AuthorityGate CMD (System)"
+  - Start Menu shortcut: "CMDHelper (System).lnk"
+  - Elevated prompt for system-level tasks
+- Three distinct operating modes:
+  - Admin: Red text (elevated)
+  - User: Green text (standard)
+  - System: Yellow text (elevated)
 - Comprehensive README documentation
 - MIT License with no-support disclaimer
 - SECURITY.md for vulnerability reporting
 - CHANGELOG.md for version tracking
 - Improved .gitignore for Visual Studio C++ projects
+
+### Changed
+- `--set-colors` now accepts 6 parameters (added System colors)
+- Updated help text to show all three modes
+- Version bumped to 1.0.0 for public release
 
 ## [0.9.0] - 2025-02
 
@@ -49,7 +62,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Date | Notes |
 |---------|------|-------|
-| 0.9.0 | Feb 2025 | Initial public release |
+| 1.0.0 | Jan 2025 | Added System mode, public release |
+| 0.9.0 | Feb 2025 | Initial development release |
 
 ---
 
