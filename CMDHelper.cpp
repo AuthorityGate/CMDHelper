@@ -1,16 +1,30 @@
-// App CMD defaults for users.cpp
-// Version: 0.9
+// CMDHelper - Windows Command Prompt Enhancement Utility
+// 
+// Copyright (c) 2025 AuthorityGate, Inc.
+// Licensed under the MIT License. See LICENSE file for details.
+// 
+// Version: 0.9.0
 // Author: Kevin E. Komlosy
 // Company: AuthorityGate Inc.
-// Created: 2/2025  Last Modified 2/2025
-// Description: This application sets up CMD defaults for users and administrators, including context menu entries and start menu shortcuts.
-// Changes:
-// - Added functionality to create Windows Start Menu entries under the folder "AuthorityGate Utilities" with shortcuts for --Admin, --User, --Reinstall, and --Uninstall.
-// - Embedded an icon into the executable and associated it with the executable in folder view.
-// - Added system variables for color, default file location, and icon path.
-// - Updated registry entries to use the embedded icon from the executable.
-
-// - test - from Jeremy
+// Repository: https://github.com/AuthorityGate/CMDHelper
+// 
+// Description:
+//   This application enhances the Windows command prompt experience by adding
+//   Explorer context menu integration, admin/user mode switching with color-coded
+//   terminals, and self-installation capabilities.
+// 
+// Features:
+//   - Right-click context menu: "AuthorityGate CMD (Admin)" and "AuthorityGate CMD (User)"
+//   - Start Menu shortcuts under "AuthorityGate Utilities"
+//   - Customizable color schemes via --set-colors
+//   - Self-installing on first run
+// 
+// Usage:
+//   CMDHelper.exe [options] [directory]
+//   Options: --help, --admin, --user, --reinstall, --uninstall, --set-colors
+// 
+// THIS SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
+// See LICENSE file for full terms.
 
 #include <iostream>
 #include <windows.h>
