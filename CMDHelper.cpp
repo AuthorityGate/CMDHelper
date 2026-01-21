@@ -79,7 +79,7 @@ void AddToPath(const std::string& path)
             if (pathValue.find(path) == std::string::npos)
             {
                 pathValue += ";" + path;
-                RegSetValueExA(hKey, "Path", 0, REG_SZ, (BYTE*)pathValue.c_str(), pathValue.size() + 1);
+                RegSetValueExA(hKey, "Path", 0, REG_SZ, (BYTE*)pathValue.c_str(), static_cast<DWORD>(pathValue.size() + 1));
             }
         }
         RegCloseKey(hKey);
@@ -181,68 +181,78 @@ void InstallExecutable()
     CreateStartMenuShortcuts();
 }
 
+// Helper function to set registry string value with proper DWORD cast
+void SetRegString(HKEY hKey, LPCSTR valueName, LPCSTR data)
+{
+    RegSetValueExA(hKey, valueName, 0, REG_SZ, (BYTE*)data, static_cast<DWORD>(strlen(data) + 1));
+}
+
 void InstallRegistryEntry()
 {
     HKEY hKey;
     
+    // Common strings
+    const char* iconPath = "C:\\Program Files\\AuthorityGate\\CMDHelper\\Authority_Gate_CMD.ico";
+    const char* exePath = "C:\\Program Files\\AuthorityGate\\CMDHelper\\CmdHelper.exe";
+    
     // Add context menu entry for directories (Admin)
     RegCreateKeyExA(HKEY_CLASSES_ROOT, "Directory\\shell\\OpenCmdHereAsAdmin", 0, NULL, 0, KEY_WRITE, NULL, &hKey, NULL);
-    RegSetValueExA(hKey, NULL, 0, REG_SZ, (BYTE*)"AuthorityGate CMD (Admin)", strlen("AuthorityGate CMD (Admin)") + 1);
-    RegSetValueExA(hKey, "Icon", 0, REG_SZ, (BYTE*)"C:\\Program Files\\AuthorityGate\\CMDHelper\\Authority_Gate_CMD.ico", strlen("C:\\Program Files\\AuthorityGate\\CMDHelper\\Authority_Gate_CMD.ico") + 1);
+    SetRegString(hKey, NULL, "AuthorityGate CMD (Admin)");
+    SetRegString(hKey, "Icon", iconPath);
     RegCreateKeyExA(hKey, "command", 0, NULL, 0, KEY_WRITE, NULL, &hKey, NULL);
-    RegSetValueExA(hKey, NULL, 0, REG_SZ, (BYTE*)"\"C:\\Program Files\\AuthorityGate\\CMDHelper\\CmdHelper.exe\" \"%1\" --admin", strlen("\"C:\\Program Files\\AuthorityGate\\CMDHelper\\CmdHelper.exe\" \"%1\" --admin") + 1);
+    SetRegString(hKey, NULL, "\"C:\\Program Files\\AuthorityGate\\CMDHelper\\CmdHelper.exe\" \"%1\" --admin");
     RegCloseKey(hKey);
 
     // Add context menu entry for directories (User)
     RegCreateKeyExA(HKEY_CLASSES_ROOT, "Directory\\shell\\OpenCmdHereAsUser", 0, NULL, 0, KEY_WRITE, NULL, &hKey, NULL);
-    RegSetValueExA(hKey, NULL, 0, REG_SZ, (BYTE*)"AuthorityGate CMD (User)", strlen("AuthorityGate CMD (User)") + 1);
-    RegSetValueExA(hKey, "Icon", 0, REG_SZ, (BYTE*)"C:\\Program Files\\AuthorityGate\\CMDHelper\\Authority_Gate_CMD.ico", strlen("C:\\Program Files\\AuthorityGate\\CMDHelper\\Authority_Gate_CMD.ico") + 1);
+    SetRegString(hKey, NULL, "AuthorityGate CMD (User)");
+    SetRegString(hKey, "Icon", iconPath);
     RegCreateKeyExA(hKey, "command", 0, NULL, 0, KEY_WRITE, NULL, &hKey, NULL);
-    RegSetValueExA(hKey, NULL, 0, REG_SZ, (BYTE*)"\"C:\\Program Files\\AuthorityGate\\CMDHelper\\CmdHelper.exe\" \"%1\" --user", strlen("\"C:\\Program Files\\AuthorityGate\\CMDHelper\\CmdHelper.exe\" \"%1\" --user") + 1);
+    SetRegString(hKey, NULL, "\"C:\\Program Files\\AuthorityGate\\CMDHelper\\CmdHelper.exe\" \"%1\" --user");
     RegCloseKey(hKey);
 
     // Add context menu entry for directories (System)
     RegCreateKeyExA(HKEY_CLASSES_ROOT, "Directory\\shell\\OpenCmdHereAsSystem", 0, NULL, 0, KEY_WRITE, NULL, &hKey, NULL);
-    RegSetValueExA(hKey, NULL, 0, REG_SZ, (BYTE*)"AuthorityGate CMD (System)", strlen("AuthorityGate CMD (System)") + 1);
-    RegSetValueExA(hKey, "Icon", 0, REG_SZ, (BYTE*)"C:\\Program Files\\AuthorityGate\\CMDHelper\\Authority_Gate_CMD.ico", strlen("C:\\Program Files\\AuthorityGate\\CMDHelper\\Authority_Gate_CMD.ico") + 1);
+    SetRegString(hKey, NULL, "AuthorityGate CMD (System)");
+    SetRegString(hKey, "Icon", iconPath);
     RegCreateKeyExA(hKey, "command", 0, NULL, 0, KEY_WRITE, NULL, &hKey, NULL);
-    RegSetValueExA(hKey, NULL, 0, REG_SZ, (BYTE*)"\"C:\\Program Files\\AuthorityGate\\CMDHelper\\CmdHelper.exe\" \"%1\" --system", strlen("\"C:\\Program Files\\AuthorityGate\\CMDHelper\\CmdHelper.exe\" \"%1\" --system") + 1);
+    SetRegString(hKey, NULL, "\"C:\\Program Files\\AuthorityGate\\CMDHelper\\CmdHelper.exe\" \"%1\" --system");
     RegCloseKey(hKey);
 
     // Add context menu entry for background of directories (Admin)
     RegCreateKeyExA(HKEY_CLASSES_ROOT, "Directory\\Background\\shell\\OpenCmdHereAsAdmin", 0, NULL, 0, KEY_WRITE, NULL, &hKey, NULL);
-    RegSetValueExA(hKey, NULL, 0, REG_SZ, (BYTE*)"AuthorityGate CMD (Admin)", strlen("AuthorityGate CMD (Admin)") + 1);
-    RegSetValueExA(hKey, "Icon", 0, REG_SZ, (BYTE*)"C:\\Program Files\\AuthorityGate\\CMDHelper\\Authority_Gate_CMD.ico", strlen("C:\\Program Files\\AuthorityGate\\CMDHelper\\Authority_Gate_CMD.ico") + 1);
+    SetRegString(hKey, NULL, "AuthorityGate CMD (Admin)");
+    SetRegString(hKey, "Icon", iconPath);
     RegCreateKeyExA(hKey, "command", 0, NULL, 0, KEY_WRITE, NULL, &hKey, NULL);
-    RegSetValueExA(hKey, NULL, 0, REG_SZ, (BYTE*)"\"C:\\Program Files\\AuthorityGate\\CMDHelper\\CmdHelper.exe\" \"%V\" --admin", strlen("\"C:\\Program Files\\AuthorityGate\\CMDHelper\\CmdHelper.exe\" \"%V\" --admin") + 1);
+    SetRegString(hKey, NULL, "\"C:\\Program Files\\AuthorityGate\\CMDHelper\\CmdHelper.exe\" \"%V\" --admin");
     RegCloseKey(hKey);
 
     // Add context menu entry for background of directories (User)
     RegCreateKeyExA(HKEY_CLASSES_ROOT, "Directory\\Background\\shell\\OpenCmdHereAsUser", 0, NULL, 0, KEY_WRITE, NULL, &hKey, NULL);
-    RegSetValueExA(hKey, NULL, 0, REG_SZ, (BYTE*)"AuthorityGate CMD (User)", strlen("AuthorityGate CMD (User)") + 1);
-    RegSetValueExA(hKey, "Icon", 0, REG_SZ, (BYTE*)"C:\\Program Files\\AuthorityGate\\CMDHelper\\Authority_Gate_CMD.ico", strlen("C:\\Program Files\\AuthorityGate\\CMDHelper\\Authority_Gate_CMD.ico") + 1);
+    SetRegString(hKey, NULL, "AuthorityGate CMD (User)");
+    SetRegString(hKey, "Icon", iconPath);
     RegCreateKeyExA(hKey, "command", 0, NULL, 0, KEY_WRITE, NULL, &hKey, NULL);
-    RegSetValueExA(hKey, NULL, 0, REG_SZ, (BYTE*)"\"C:\\Program Files\\AuthorityGate\\CMDHelper\\CmdHelper.exe\" \"%V\" --user", strlen("\"C:\\Program Files\\AuthorityGate\\CMDHelper\\CmdHelper.exe\" \"%V\" --user") + 1);
+    SetRegString(hKey, NULL, "\"C:\\Program Files\\AuthorityGate\\CMDHelper\\CmdHelper.exe\" \"%V\" --user");
     RegCloseKey(hKey);
 
     // Add context menu entry for background of directories (System)
     RegCreateKeyExA(HKEY_CLASSES_ROOT, "Directory\\Background\\shell\\OpenCmdHereAsSystem", 0, NULL, 0, KEY_WRITE, NULL, &hKey, NULL);
-    RegSetValueExA(hKey, NULL, 0, REG_SZ, (BYTE*)"AuthorityGate CMD (System)", strlen("AuthorityGate CMD (System)") + 1);
-    RegSetValueExA(hKey, "Icon", 0, REG_SZ, (BYTE*)"C:\\Program Files\\AuthorityGate\\CMDHelper\\Authority_Gate_CMD.ico", strlen("C:\\Program Files\\AuthorityGate\\CMDHelper\\Authority_Gate_CMD.ico") + 1);
+    SetRegString(hKey, NULL, "AuthorityGate CMD (System)");
+    SetRegString(hKey, "Icon", iconPath);
     RegCreateKeyExA(hKey, "command", 0, NULL, 0, KEY_WRITE, NULL, &hKey, NULL);
-    RegSetValueExA(hKey, NULL, 0, REG_SZ, (BYTE*)"\"C:\\Program Files\\AuthorityGate\\CMDHelper\\CmdHelper.exe\" \"%V\" --system", strlen("\"C:\\Program Files\\AuthorityGate\\CMDHelper\\CmdHelper.exe\" \"%V\" --system") + 1);
+    SetRegString(hKey, NULL, "\"C:\\Program Files\\AuthorityGate\\CMDHelper\\CmdHelper.exe\" \"%V\" --system");
     RegCloseKey(hKey);
 
     // Create system variables for color and default file location
     RegCreateKeyExA(HKEY_LOCAL_MACHINE, "SOFTWARE\\AuthorityGate\\CMDHelper", 0, NULL, 0, KEY_WRITE, NULL, &hKey, NULL);
-    RegSetValueExA(hKey, "AdminTextColor", 0, REG_SZ, (BYTE*)"4", 2);      // Red
-    RegSetValueExA(hKey, "UserTextColor", 0, REG_SZ, (BYTE*)"A", 2);       // Light Green
-    RegSetValueExA(hKey, "SystemTextColor", 0, REG_SZ, (BYTE*)"E", 2);     // Yellow
-    RegSetValueExA(hKey, "AdminBackgroundColor", 0, REG_SZ, (BYTE*)"0", 2);  // Black
-    RegSetValueExA(hKey, "UserBackgroundColor", 0, REG_SZ, (BYTE*)"0", 2);   // Black
-    RegSetValueExA(hKey, "SystemBackgroundColor", 0, REG_SZ, (BYTE*)"0", 2); // Black
-    RegSetValueExA(hKey, "DefaultLocation", 0, REG_SZ, (BYTE*)"C:\\Program Files\\AuthorityGate\\CMDHelper", strlen("C:\\Program Files\\AuthorityGate\\CMDHelper") + 1);
-    RegSetValueExA(hKey, "IconPath", 0, REG_SZ, (BYTE*)"C:\\Program Files\\AuthorityGate\\CMDHelper\\Authority_Gate_CMD.ico", strlen("C:\\Program Files\\AuthorityGate\\CMDHelper\\Authority_Gate_CMD.ico") + 1);
+    SetRegString(hKey, "AdminTextColor", "4");       // Red
+    SetRegString(hKey, "UserTextColor", "A");        // Light Green
+    SetRegString(hKey, "SystemTextColor", "E");      // Yellow
+    SetRegString(hKey, "AdminBackgroundColor", "0"); // Black
+    SetRegString(hKey, "UserBackgroundColor", "0");  // Black
+    SetRegString(hKey, "SystemBackgroundColor", "0");// Black
+    SetRegString(hKey, "DefaultLocation", "C:\\Program Files\\AuthorityGate\\CMDHelper");
+    SetRegString(hKey, "IconPath", iconPath);
     RegCloseKey(hKey);
 
     std::cout << "Registry entries installed successfully." << std::endl;
@@ -311,7 +321,7 @@ void SetRegistryValue(const std::string& key, const std::string& valueName, cons
 {
     HKEY hKey;
     RegOpenKeyExA(HKEY_LOCAL_MACHINE, key.c_str(), 0, KEY_WRITE, &hKey);
-    RegSetValueExA(hKey, valueName.c_str(), 0, REG_SZ, (BYTE*)value.c_str(), value.size() + 1);
+    RegSetValueExA(hKey, valueName.c_str(), 0, REG_SZ, (BYTE*)value.c_str(), static_cast<DWORD>(value.size() + 1));
     RegCloseKey(hKey);
 }
 
