@@ -1,4 +1,6 @@
-# CMDHelper
+# CMD Help
+
+Windows 11 removed the practical ability to keep separate color identities for different command-line entries. CMD Help adds that feature back, giving PowerShell, Administrator, User, and System console windows their own immediately recognizable colors.
 
 A lightweight Windows utility that enhances the command prompt experience with context menu integration, three distinct operating modes, and customizable color schemes.
 
@@ -63,6 +65,8 @@ Options:
   --admin          Open CMD as Administrator (Red)
   --user           Open CMD as standard User (Green)
   --system         Open CMD for System tasks (Yellow)
+  --powershell     Open PowerShell (Cyan)
+  --check-updates  Check for the newest signed AuthorityGate release
   --reinstall      Reinstall registry entries and shortcuts
   --uninstall      Remove all registry entries and shortcuts
   --set-colors     Customize terminal colors

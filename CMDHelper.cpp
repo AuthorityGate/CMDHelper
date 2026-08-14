@@ -3,7 +3,7 @@
 // Copyright (c) 2025 AuthorityGate, Inc.
 // Licensed under the MIT License. See LICENSE file for details.
 // 
-// Version: 1.0.0
+// Version: 1.1.0
 // Author: Kevin E. Komlosy
 // Company: AuthorityGate Inc.
 // Repository: https://github.com/AuthorityGate/CMDHelper
@@ -35,6 +35,8 @@
 #include <iostream>
 #include <windows.h>
 #include <string>
+#include <fstream>
+#include <ctime>
 #include <shlobj.h> // For SHCreateDirectoryEx
 #include <comdef.h> // For _com_error
 
@@ -50,6 +52,77 @@ void StartCmd(const std::string& command, bool asAdmin)
         DWORD error = GetLastError();
         std::cerr << "Failed to start CMD" << (asAdmin ? " as Admin" : " as User") << ". Error: " << error << std::endl;
     }
+}
+
+void StartPowerShell(const std::string& directory)
+{
+    std::string escapedDirectory = directory;
+    size_t position = 0;
+    while ((position = escapedDirectory.find("'", position)) != std::string::npos)
+    {
+        escapedDirectory.replace(position, 1, "''");
+        position += 2;
+    }
+
+    std::string parameters = "-NoExit -NoLogo -Command \"$Host.UI.RawUI.ForegroundColor='Cyan'; "
+        "$Host.UI.RawUI.BackgroundColor='Black'; Clear-Host; Set-Location -LiteralPath '" + escapedDirectory + "'\"";
+    SHELLEXECUTEINFOA sei = { sizeof(sei) };
+    sei.lpVerb = "open";
+    sei.lpFile = "powershell.exe";
+    sei.lpParameters = parameters.c_str();
+    sei.nShow = SW_SHOWNORMAL;
+    ShellExecuteExA(&sei);
+}
+
+void CheckForUpdates(bool forceCheck)
+{
+    HKEY hKey;
+    DWORD now = static_cast<DWORD>(std::time(nullptr));
+    DWORD lastCheck = 0;
+    DWORD valueSize = sizeof(lastCheck);
+    if (RegCreateKeyExA(HKEY_CURRENT_USER, "SOFTWARE\\AuthorityGate\\CMDHelper", 0, NULL, 0,
+        KEY_READ | KEY_WRITE, NULL, &hKey, NULL) != ERROR_SUCCESS)
+        return;
+
+    RegQueryValueExA(hKey, "LastUpdateCheck", NULL, NULL, reinterpret_cast<LPBYTE>(&lastCheck), &valueSize);
+    if (!forceCheck && lastCheck != 0 && now - lastCheck < 86400)
+    {
+        RegCloseKey(hKey);
+        return;
+    }
+    RegSetValueExA(hKey, "LastUpdateCheck", 0, REG_DWORD, reinterpret_cast<const BYTE*>(&now), sizeof(now));
+    RegCloseKey(hKey);
+
+    char tempPath[MAX_PATH];
+    char scriptPath[MAX_PATH];
+    GetTempPathA(MAX_PATH, tempPath);
+    GetTempFileNameA(tempPath, "AGU", 0, scriptPath);
+    std::string finalScriptPath = std::string(scriptPath) + ".ps1";
+    MoveFileExA(scriptPath, finalScriptPath.c_str(), MOVEFILE_REPLACE_EXISTING);
+
+    std::ofstream script(finalScriptPath, std::ios::trunc);
+    script << "$ErrorActionPreference='Stop'\n"
+        << "$current=[version]'1.1.0'\n"
+        << "$release=Invoke-RestMethod -Headers @{'User-Agent'='AuthorityGate-CMDHelp'} -Uri 'https://api.github.com/repos/AuthorityGate/CMDHelper/releases/latest'\n"
+        << "$latest=[version]($release.tag_name.TrimStart('v'))\n"
+        << "if($latest -le $current){";
+    if (forceCheck)
+        script << "Add-Type -AssemblyName PresentationFramework; [System.Windows.MessageBox]::Show('CMD Help is up to date.','AuthorityGate CMD Help')|Out-Null;";
+    script << "exit}\n"
+        << "$asset=$release.assets|Where-Object{$_.name -match '(?i)CMD[-_ ]?Help.*\\.exe$'}|Select-Object -First 1\n"
+        << "if(!$asset){throw 'The release does not contain a CMD Help installer.'}\n"
+        << "Add-Type -AssemblyName PresentationFramework\n"
+        << "$choice=[System.Windows.MessageBox]::Show(('CMD Help '+$latest+' is available. Download and install it now?'),'AuthorityGate CMD Help Update','YesNo','Information')\n"
+        << "if($choice -ne 'Yes'){exit}\n"
+        << "$target=Join-Path $env:TEMP $asset.name\n"
+        << "Invoke-WebRequest -Headers @{'User-Agent'='AuthorityGate-CMDHelp'} -Uri $asset.browser_download_url -OutFile $target\n"
+        << "$signature=Get-AuthenticodeSignature -FilePath $target\n"
+        << "if($signature.Status -ne 'Valid' -or $signature.SignerCertificate.Subject -notmatch 'CN=AUTHORITYGATE INC'){Remove-Item $target -Force; throw 'Update signature validation failed.'}\n"
+        << "Start-Process -FilePath $target -Verb RunAs\n";
+    script.close();
+
+    std::string parameters = "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File \"" + finalScriptPath + "\"";
+    ShellExecuteA(NULL, "open", "powershell.exe", parameters.c_str(), NULL, SW_HIDE);
 }
 
 bool IsFirstRun()
@@ -147,6 +220,7 @@ void CreateStartMenuShortcuts()
     CreateShortcut(exePath, "--admin", folderPath + "\\CMDHelper (Admin).lnk", "Open CMDHelper as Admin - Red");
     CreateShortcut(exePath, "--user", folderPath + "\\CMDHelper (User).lnk", "Open CMDHelper as User - Green");
     CreateShortcut(exePath, "--system", folderPath + "\\CMDHelper (System).lnk", "Open CMDHelper as System - Yellow");
+    CreateShortcut(exePath, "--powershell", folderPath + "\\CMDHelper (PowerShell).lnk", "Open PowerShell - Cyan");
     CreateShortcut(exePath, "--reinstall", folderPath + "\\CMDHelper (Reinstall).lnk", "Reinstall CMDHelper");
     CreateShortcut(exePath, "--uninstall", folderPath + "\\CMDHelper (Uninstall).lnk", "Uninstall CMDHelper");
 }
@@ -255,6 +329,20 @@ void InstallRegistryEntry()
     SetRegString(hKey, "IconPath", iconPath);
     RegCloseKey(hKey);
 
+    RegCreateKeyExA(HKEY_CLASSES_ROOT, "Directory\\shell\\OpenPowerShellHereAuthorityGate", 0, NULL, 0, KEY_WRITE, NULL, &hKey, NULL);
+    SetRegString(hKey, NULL, "AuthorityGate PowerShell");
+    SetRegString(hKey, "Icon", iconPath);
+    RegCreateKeyExA(hKey, "command", 0, NULL, 0, KEY_WRITE, NULL, &hKey, NULL);
+    SetRegString(hKey, NULL, "\"C:\\Program Files\\AuthorityGate\\CMDHelper\\CmdHelper.exe\" \"%1\" --powershell");
+    RegCloseKey(hKey);
+
+    RegCreateKeyExA(HKEY_CLASSES_ROOT, "Directory\\Background\\shell\\OpenPowerShellHereAuthorityGate", 0, NULL, 0, KEY_WRITE, NULL, &hKey, NULL);
+    SetRegString(hKey, NULL, "AuthorityGate PowerShell");
+    SetRegString(hKey, "Icon", iconPath);
+    RegCreateKeyExA(hKey, "command", 0, NULL, 0, KEY_WRITE, NULL, &hKey, NULL);
+    SetRegString(hKey, NULL, "\"C:\\Program Files\\AuthorityGate\\CMDHelper\\CmdHelper.exe\" \"%V\" --powershell");
+    RegCloseKey(hKey);
+
     std::cout << "Registry entries installed successfully." << std::endl;
 }
 
@@ -264,10 +352,12 @@ void UninstallRegistryEntry()
     RegDeleteTreeA(HKEY_CLASSES_ROOT, "Directory\\shell\\OpenCmdHereAsAdmin");
     RegDeleteTreeA(HKEY_CLASSES_ROOT, "Directory\\shell\\OpenCmdHereAsUser");
     RegDeleteTreeA(HKEY_CLASSES_ROOT, "Directory\\shell\\OpenCmdHereAsSystem");
+    RegDeleteTreeA(HKEY_CLASSES_ROOT, "Directory\\shell\\OpenPowerShellHereAuthorityGate");
     // Remove context menu entries for background of directories
     RegDeleteTreeA(HKEY_CLASSES_ROOT, "Directory\\Background\\shell\\OpenCmdHereAsAdmin");
     RegDeleteTreeA(HKEY_CLASSES_ROOT, "Directory\\Background\\shell\\OpenCmdHereAsUser");
     RegDeleteTreeA(HKEY_CLASSES_ROOT, "Directory\\Background\\shell\\OpenCmdHereAsSystem");
+    RegDeleteTreeA(HKEY_CLASSES_ROOT, "Directory\\Background\\shell\\OpenPowerShellHereAuthorityGate");
     // Remove system variables for color and default location
     RegDeleteTreeA(HKEY_LOCAL_MACHINE, "SOFTWARE\\AuthorityGate\\CMDHelper");
 
@@ -288,7 +378,7 @@ std::string GetRegistryValue(const std::string& key, const std::string& valueNam
 void ShowHelp()
 {
     std::cout << "\nCMDHelper - An AuthorityGate Utility\n";
-    std::cout << "Version 1.0.0\n\n";
+    std::cout << "Version 1.1.0\n\n";
     std::cout << "Usage: CmdHelper [options] [directory]\n\n";
     std::cout << "Options:\n";
     std::cout << "  --help           Show this help message\n";
@@ -297,6 +387,8 @@ void ShowHelp()
     std::cout << "  --admin          Open CMD as Admin (Red text)\n";
     std::cout << "  --user           Open CMD as User (Green text)\n";
     std::cout << "  --system         Open CMD as System (Yellow text)\n";
+    std::cout << "  --powershell     Open PowerShell (Cyan text)\n";
+    std::cout << "  --check-updates  Check GitHub for a signed update\n";
     std::cout << "  --set-colors     Set color codes for Admin, User, and System\n";
     std::cout << "                   Usage: --set-colors <AdminText> <UserText> <SystemText> <AdminBg> <UserBg> <SystemBg>\n";
     std::cout << "\nModes:\n";
@@ -357,6 +449,11 @@ int main(int argc, char* argv[])
             InstallRegistryEntry();
             return 0;
         }
+        else if (arg == "--check-updates")
+        {
+            CheckForUpdates(true);
+            return 0;
+        }
         else if (arg == "--set-colors" && argc == 8)
         {
             // Usage: --set-colors <AdminText> <UserText> <SystemText> <AdminBg> <UserBg> <SystemBg>
@@ -372,6 +469,8 @@ int main(int argc, char* argv[])
         InstallExecutable();
         InstallRegistryEntry();
     }
+
+    CheckForUpdates(false);
 
     // Read color settings from registry
     std::string adminTextColor = GetRegistryValue("SOFTWARE\\AuthorityGate\\CMDHelper", "AdminTextColor");
@@ -393,7 +492,7 @@ int main(int argc, char* argv[])
     {
         // First argument is directory if second argument is a mode flag
         std::string lastArg = argv[argc - 1];
-        if (lastArg == "--admin" || lastArg == "--user" || lastArg == "--system")
+        if (lastArg == "--admin" || lastArg == "--user" || lastArg == "--system" || lastArg == "--powershell")
         {
             directory = argv[1];
         }
@@ -409,7 +508,7 @@ int main(int argc, char* argv[])
     if (argc > 1)
     {
         std::string lastArg = argv[argc - 1];
-        if (lastArg == "--admin" || lastArg == "--user" || lastArg == "--system")
+        if (lastArg == "--admin" || lastArg == "--user" || lastArg == "--system" || lastArg == "--powershell")
         {
             mode = lastArg;
         }
@@ -423,6 +522,10 @@ int main(int argc, char* argv[])
     else if (mode == "--system")
     {
         StartCmd(systemCommand, true);  // System also runs elevated
+    }
+    else if (mode == "--powershell")
+    {
+        StartPowerShell(directory);
     }
     else
     {

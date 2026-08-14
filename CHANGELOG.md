@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0] - 2026-08-14
+
+- Restores distinct console color identities on Windows 11 for PowerShell, Administrator, User, and System sessions
+- Adds PowerShell Start Menu and Explorer context-menu entries
+- Adds automatic daily and on-demand GitHub release checks
+- Rejects downloaded updates unless Authenticode validates the AuthorityGate code-signing certificate
+
 All notable changes to CMDHelper will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
