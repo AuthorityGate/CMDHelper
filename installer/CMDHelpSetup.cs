@@ -10,16 +10,24 @@ using Microsoft.Win32;
 
 internal static class Program
 {
-    internal const string Version = "1.1.1";
+    internal const string Version = "1.1.2";
     internal static readonly string InstallDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "AuthorityGate", "CMDHelper");
 
     [STAThread]
     private static void Main(string[] args)
     {
-        if (args.Length > 0 && args[0].Equals("/uninstall", StringComparison.OrdinalIgnoreCase))
+        bool silent = Array.Exists(args, argument => argument.Equals("/silent", StringComparison.OrdinalIgnoreCase) || argument.Equals("/quiet", StringComparison.OrdinalIgnoreCase));
+        bool uninstall = Array.Exists(args, argument => argument.Equals("/uninstall", StringComparison.OrdinalIgnoreCase));
+        if (uninstall)
         {
-            EnsureElevated("/uninstall");
-            Uninstall();
+            EnsureElevated(silent ? "/uninstall /silent" : "/uninstall");
+            Uninstall(silent);
+            return;
+        }
+        if (silent)
+        {
+            if (!IsAdministrator()) { EnsureElevated("/silent"); return; }
+            Install();
             return;
         }
         if (!IsAdministrator()) { EnsureElevated(""); return; }
@@ -58,9 +66,18 @@ internal static class Program
             key.SetValue("InstallLocation", InstallDirectory);
             key.SetValue("DisplayIcon", Path.Combine(InstallDirectory, "CmdHelper.exe"));
             key.SetValue("UninstallString", "\"" + Path.Combine(InstallDirectory, "CMDHelpSetup.exe") + "\" /uninstall");
+            key.SetValue("QuietUninstallString", "\"" + Path.Combine(InstallDirectory, "CMDHelpSetup.exe") + "\" /uninstall /silent");
             key.SetValue("NoModify", 1, RegistryValueKind.DWord);
             key.SetValue("NoRepair", 1, RegistryValueKind.DWord);
+            key.SetValue("EstimatedSize", (int)(DirectorySize(InstallDirectory) / 1024), RegistryValueKind.DWord);
         }
+    }
+
+    private static long DirectorySize(string path)
+    {
+        long total = 0;
+        foreach (string file in Directory.GetFiles(path, "*", SearchOption.AllDirectories)) total += new FileInfo(file).Length;
+        return total;
     }
 
     private static void Extract(string resourceName, string destination)
@@ -70,9 +87,9 @@ internal static class Program
             source.CopyTo(target);
     }
 
-    private static void Uninstall()
+    private static void Uninstall(bool silent)
     {
-        if (MessageBox.Show("Remove AuthorityGate CMD Help and its console shortcuts?", "CMD Help Setup", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) return;
+        if (!silent && MessageBox.Show("Remove AuthorityGate CMD Help and its console shortcuts?", "CMD Help Setup", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) return;
         string app = Path.Combine(InstallDirectory, "CmdHelper.exe");
         if (File.Exists(app))
         {
@@ -82,7 +99,7 @@ internal static class Program
         Registry.LocalMachine.DeleteSubKeyTree(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\AuthorityGate CMD Help", false);
         string directory = InstallDirectory;
         Process.Start(new ProcessStartInfo("cmd.exe", "/c ping 127.0.0.1 -n 3 > nul & rmdir /s /q \"" + directory + "\"") { CreateNoWindow = true, UseShellExecute = false });
-        MessageBox.Show("CMD Help was removed.", "CMD Help Setup", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        if (!silent) MessageBox.Show("CMD Help was removed.", "CMD Help Setup", MessageBoxButtons.OK, MessageBoxIcon.Information);
     }
 }
 
