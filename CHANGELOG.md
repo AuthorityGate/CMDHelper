@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.1.1] - 2026-08-14
+
+- Replaces the standalone release executable with a signed setup wizard
+- Adds in-place upgrade handling, Program Files installation, and Windows uninstall registration
+- Makes automatic updates target the versioned setup package
+
 ## [1.1.0] - 2026-08-14
 
 - Restores distinct console color identities on Windows 11 for PowerShell, Administrator, User, and System sessions

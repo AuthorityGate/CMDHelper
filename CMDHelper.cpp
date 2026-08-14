@@ -3,7 +3,7 @@
 // Copyright (c) 2025 AuthorityGate, Inc.
 // Licensed under the MIT License. See LICENSE file for details.
 // 
-// Version: 1.1.0
+// Version: 1.1.1
 // Author: Kevin E. Komlosy
 // Company: AuthorityGate Inc.
 // Repository: https://github.com/AuthorityGate/CMDHelper
@@ -102,14 +102,14 @@ void CheckForUpdates(bool forceCheck)
 
     std::ofstream script(finalScriptPath, std::ios::trunc);
     script << "$ErrorActionPreference='Stop'\n"
-        << "$current=[version]'1.1.0'\n"
+        << "$current=[version]'1.1.1'\n"
         << "$release=Invoke-RestMethod -Headers @{'User-Agent'='AuthorityGate-CMDHelp'} -Uri 'https://api.github.com/repos/AuthorityGate/CMDHelper/releases/latest'\n"
         << "$latest=[version]($release.tag_name.TrimStart('v'))\n"
         << "if($latest -le $current){";
     if (forceCheck)
         script << "Add-Type -AssemblyName PresentationFramework; [System.Windows.MessageBox]::Show('CMD Help is up to date.','AuthorityGate CMD Help')|Out-Null;";
     script << "exit}\n"
-        << "$asset=$release.assets|Where-Object{$_.name -match '(?i)CMD[-_ ]?Help.*\\.exe$'}|Select-Object -First 1\n"
+        << "$asset=$release.assets|Where-Object{$_.name -match '(?i)^CMD-Help-Setup-.*-x64\\.exe$'}|Select-Object -First 1\n"
         << "if(!$asset){throw 'The release does not contain a CMD Help installer.'}\n"
         << "Add-Type -AssemblyName PresentationFramework\n"
         << "$choice=[System.Windows.MessageBox]::Show(('CMD Help '+$latest+' is available. Download and install it now?'),'AuthorityGate CMD Help Update','YesNo','Information')\n"
@@ -378,7 +378,7 @@ std::string GetRegistryValue(const std::string& key, const std::string& valueNam
 void ShowHelp()
 {
     std::cout << "\nCMDHelper - An AuthorityGate Utility\n";
-    std::cout << "Version 1.1.0\n\n";
+    std::cout << "Version 1.1.1\n\n";
     std::cout << "Usage: CmdHelper [options] [directory]\n\n";
     std::cout << "Options:\n";
     std::cout << "  --help           Show this help message\n";
