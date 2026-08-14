@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.2.0] - 2026-08-14
+
+- Renamed the product to AuthorityGate ShellColors.
+- Added reliable `/silent`, `/quiet`, and `/S` unattended setup modes for WinGet validation.
+- Added free first-use registration and silent startup check-ins to License AuthorityGate with email, computer name, starting version, current version, and last-used time.
+- Moved Windows integration into setup so installation no longer starts an interactive child console.
+- Added signed update discovery for the renamed ShellColors installer.
+
 ## [1.1.1] - 2026-08-14
 
 - Replaces the standalone release executable with a signed setup wizard
@@ -88,4 +96,4 @@ The following features may be considered for future versions (no timeline or com
 - [ ] PowerShell mode in addition to CMD
 - [ ] Configurable installation directory
 - [ ] Silent installation mode for enterprise deployment
-- [ ] Code signing for SmartScreen compatibility
+- [x] Code signing for SmartScreen compatibility

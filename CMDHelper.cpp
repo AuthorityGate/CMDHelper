@@ -1,9 +1,9 @@
-// CMDHelper - Windows Command Prompt Enhancement Utility
+// AuthorityGate ShellColors - Windows Console Color Utility
 // 
 // Copyright (c) 2025 AuthorityGate, Inc.
 // Licensed under the MIT License. See LICENSE file for details.
 // 
-// Version: 1.1.1
+// Version: 1.2.0
 // Author: Kevin E. Komlosy
 // Company: AuthorityGate Inc.
 // Repository: https://github.com/AuthorityGate/CMDHelper
@@ -102,20 +102,20 @@ void CheckForUpdates(bool forceCheck)
 
     std::ofstream script(finalScriptPath, std::ios::trunc);
     script << "$ErrorActionPreference='Stop'\n"
-        << "$current=[version]'1.1.1'\n"
-        << "$release=Invoke-RestMethod -Headers @{'User-Agent'='AuthorityGate-CMDHelp'} -Uri 'https://api.github.com/repos/AuthorityGate/CMDHelper/releases/latest'\n"
+        << "$current=[version]'1.2.0'\n"
+        << "$release=Invoke-RestMethod -Headers @{'User-Agent'='AuthorityGate-ShellColors'} -Uri 'https://api.github.com/repos/AuthorityGate/CMDHelper/releases/latest'\n"
         << "$latest=[version]($release.tag_name.TrimStart('v'))\n"
         << "if($latest -le $current){";
     if (forceCheck)
-        script << "Add-Type -AssemblyName PresentationFramework; [System.Windows.MessageBox]::Show('CMD Help is up to date.','AuthorityGate CMD Help')|Out-Null;";
+        script << "Add-Type -AssemblyName PresentationFramework; [System.Windows.MessageBox]::Show('ShellColors is up to date.','AuthorityGate ShellColors')|Out-Null;";
     script << "exit}\n"
-        << "$asset=$release.assets|Where-Object{$_.name -match '(?i)^CMD-Help-Setup-.*-x64\\.exe$'}|Select-Object -First 1\n"
-        << "if(!$asset){throw 'The release does not contain a CMD Help installer.'}\n"
+        << "$asset=$release.assets|Where-Object{$_.name -match '(?i)^AuthorityGate-ShellColors-Setup-.*-x64\\.exe$'}|Select-Object -First 1\n"
+        << "if(!$asset){throw 'The release does not contain a ShellColors installer.'}\n"
         << "Add-Type -AssemblyName PresentationFramework\n"
-        << "$choice=[System.Windows.MessageBox]::Show(('CMD Help '+$latest+' is available. Download and install it now?'),'AuthorityGate CMD Help Update','YesNo','Information')\n"
+        << "$choice=[System.Windows.MessageBox]::Show(('ShellColors '+$latest+' is available. Download and install it now?'),'AuthorityGate ShellColors Update','YesNo','Information')\n"
         << "if($choice -ne 'Yes'){exit}\n"
         << "$target=Join-Path $env:TEMP $asset.name\n"
-        << "Invoke-WebRequest -Headers @{'User-Agent'='AuthorityGate-CMDHelp'} -Uri $asset.browser_download_url -OutFile $target\n"
+        << "Invoke-WebRequest -Headers @{'User-Agent'='AuthorityGate-ShellColors'} -Uri $asset.browser_download_url -OutFile $target\n"
         << "$signature=Get-AuthenticodeSignature -FilePath $target\n"
         << "if($signature.Status -ne 'Valid' -or $signature.SignerCertificate.Subject -notmatch 'CN=AUTHORITYGATE INC'){Remove-Item $target -Force; throw 'Update signature validation failed.'}\n"
         << "Start-Process -FilePath $target -Verb RunAs\n";
@@ -128,13 +128,30 @@ void CheckForUpdates(bool forceCheck)
 bool IsFirstRun()
 {
     HKEY hKey;
-    LONG result = RegOpenKeyExA(HKEY_LOCAL_MACHINE, "SOFTWARE\\AuthorityGate\\CMDHelper", 0, KEY_READ, &hKey);
+    LONG result = RegOpenKeyExA(HKEY_LOCAL_MACHINE, "SOFTWARE\\AuthorityGate\\ShellColors", 0, KEY_READ, &hKey);
     if (result == ERROR_SUCCESS)
     {
         RegCloseKey(hKey);
         return false;
     }
     return true;
+}
+
+void StartRegistrationCheckIn()
+{
+    char modulePath[MAX_PATH];
+    GetModuleFileNameA(NULL, modulePath, MAX_PATH);
+    std::string directory = modulePath;
+    size_t separator = directory.find_last_of("\\/");
+    if (separator != std::string::npos) directory.resize(separator);
+    std::string agent = directory + "\\ShellColorsRegistration.exe";
+    if (GetFileAttributesA(agent.c_str()) == INVALID_FILE_ATTRIBUTES) return;
+    SHELLEXECUTEINFOA info = { sizeof(info) };
+    info.lpVerb = "open";
+    info.lpFile = agent.c_str();
+    info.lpDirectory = directory.c_str();
+    info.nShow = SW_SHOWNORMAL;
+    ShellExecuteExA(&info);
 }
 
 void AddToPath(const std::string& path)
@@ -377,9 +394,9 @@ std::string GetRegistryValue(const std::string& key, const std::string& valueNam
 
 void ShowHelp()
 {
-    std::cout << "\nCMDHelper - An AuthorityGate Utility\n";
-    std::cout << "Version 1.1.1\n\n";
-    std::cout << "Usage: CmdHelper [options] [directory]\n\n";
+    std::cout << "\nAuthorityGate ShellColors\n";
+    std::cout << "Version 1.2.0\n\n";
+    std::cout << "Usage: ShellColors [options] [directory]\n\n";
     std::cout << "Options:\n";
     std::cout << "  --help           Show this help message\n";
     std::cout << "  --uninstall      Uninstall registry entries\n";
@@ -470,16 +487,17 @@ int main(int argc, char* argv[])
         InstallRegistryEntry();
     }
 
+    StartRegistrationCheckIn();
     CheckForUpdates(false);
 
     // Read color settings from registry
-    std::string adminTextColor = GetRegistryValue("SOFTWARE\\AuthorityGate\\CMDHelper", "AdminTextColor");
-    std::string userTextColor = GetRegistryValue("SOFTWARE\\AuthorityGate\\CMDHelper", "UserTextColor");
-    std::string systemTextColor = GetRegistryValue("SOFTWARE\\AuthorityGate\\CMDHelper", "SystemTextColor");
-    std::string adminBackgroundColor = GetRegistryValue("SOFTWARE\\AuthorityGate\\CMDHelper", "AdminBackgroundColor");
-    std::string userBackgroundColor = GetRegistryValue("SOFTWARE\\AuthorityGate\\CMDHelper", "UserBackgroundColor");
-    std::string systemBackgroundColor = GetRegistryValue("SOFTWARE\\AuthorityGate\\CMDHelper", "SystemBackgroundColor");
-    std::string defaultLocation = GetRegistryValue("SOFTWARE\\AuthorityGate\\CMDHelper", "DefaultLocation");
+    std::string adminTextColor = GetRegistryValue("SOFTWARE\\AuthorityGate\\ShellColors", "AdminTextColor");
+    std::string userTextColor = GetRegistryValue("SOFTWARE\\AuthorityGate\\ShellColors", "UserTextColor");
+    std::string systemTextColor = GetRegistryValue("SOFTWARE\\AuthorityGate\\ShellColors", "SystemTextColor");
+    std::string adminBackgroundColor = GetRegistryValue("SOFTWARE\\AuthorityGate\\ShellColors", "AdminBackgroundColor");
+    std::string userBackgroundColor = GetRegistryValue("SOFTWARE\\AuthorityGate\\ShellColors", "UserBackgroundColor");
+    std::string systemBackgroundColor = GetRegistryValue("SOFTWARE\\AuthorityGate\\ShellColors", "SystemBackgroundColor");
+    std::string defaultLocation = GetRegistryValue("SOFTWARE\\AuthorityGate\\ShellColors", "DefaultLocation");
 
     // Build command strings for each mode
     std::string adminCommand = "/k color " + adminBackgroundColor + adminTextColor;

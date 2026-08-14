@@ -1,6 +1,8 @@
-# CMD Help
+# AuthorityGate ShellColors
 
-Windows 11 removed the practical ability to keep separate color identities for different command-line entries. CMD Help adds that feature back, giving PowerShell, Administrator, User, and System console windows their own immediately recognizable colors.
+Windows 11 removed the practical ability to keep separate color identities for different command-line entries. AuthorityGate ShellColors adds that feature back, giving PowerShell, Administrator, User, and System console windows their own immediately recognizable colors.
+
+Registration is free. The signed installer supports unattended WinGet deployment with `/silent`, and the application checks for signed updates and reports its registered email, computer name, starting version, current version, and last-used time to the AuthorityGate License dashboard. Network failures are ignored and retried on a later launch.
 
 A lightweight Windows utility that enhances the command prompt experience with context menu integration, three distinct operating modes, and customizable color schemes.
 
