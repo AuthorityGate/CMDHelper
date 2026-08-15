@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.2.1] - 2026-08-14
+
+- Simplified optional registration to email only.
+- Made **Not now** close registration immediately and ask again on a later launch.
+- Prevented multiple registration windows from stacking when several consoles open.
+
 ## [1.2.0] - 2026-08-14
 
 - Renamed the product to AuthorityGate ShellColors.

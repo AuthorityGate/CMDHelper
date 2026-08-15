@@ -3,7 +3,7 @@
 // Copyright (c) 2025 AuthorityGate, Inc.
 // Licensed under the MIT License. See LICENSE file for details.
 // 
-// Version: 1.2.0
+// Version: 1.2.1
 // Author: Kevin E. Komlosy
 // Company: AuthorityGate Inc.
 // Repository: https://github.com/AuthorityGate/CMDHelper
@@ -102,7 +102,7 @@ void CheckForUpdates(bool forceCheck)
 
     std::ofstream script(finalScriptPath, std::ios::trunc);
     script << "$ErrorActionPreference='Stop'\n"
-        << "$current=[version]'1.2.0'\n"
+        << "$current=[version]'1.2.1'\n"
         << "$release=Invoke-RestMethod -Headers @{'User-Agent'='AuthorityGate-ShellColors'} -Uri 'https://api.github.com/repos/AuthorityGate/CMDHelper/releases/latest'\n"
         << "$latest=[version]($release.tag_name.TrimStart('v'))\n"
         << "if($latest -le $current){";
@@ -395,7 +395,7 @@ std::string GetRegistryValue(const std::string& key, const std::string& valueNam
 void ShowHelp()
 {
     std::cout << "\nAuthorityGate ShellColors\n";
-    std::cout << "Version 1.2.0\n\n";
+    std::cout << "Version 1.2.1\n\n";
     std::cout << "Usage: ShellColors [options] [directory]\n\n";
     std::cout << "Options:\n";
     std::cout << "  --help           Show this help message\n";
