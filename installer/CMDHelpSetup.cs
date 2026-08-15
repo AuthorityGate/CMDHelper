@@ -9,7 +9,7 @@ using Microsoft.Win32;
 
 internal static class Program
 {
-    internal const string Version = "1.2.1";
+    internal const string Version = "1.2.2";
     internal const string ProductName = "AuthorityGate ShellColors";
     internal static readonly string InstallDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "AuthorityGate", "ShellColors");
     private const string UninstallKey = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\AuthorityGate ShellColors";

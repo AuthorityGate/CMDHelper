@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.2.2] - 2026-08-14
+
+- Fixed the email-first registration request when Company is blank.
+- Removed the incorrect requirement to register on a separate website first.
+- Registration now completes directly inside ShellColors for any valid email.
+
 ## [1.2.1] - 2026-08-14
 
 - Simplified optional registration to email only.

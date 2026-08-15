@@ -9,7 +9,7 @@ using Microsoft.Win32;
 
 internal static class RegistrationProgram
 {
-    private const string Version = "1.2.1";
+    private const string Version = "1.2.2";
     private const string RegistryPath = @"SOFTWARE\AuthorityGate\ShellColors";
     private const string Endpoint = "https://license.authoritygate.com/api/applications/check-in";
 
@@ -54,7 +54,7 @@ internal static class RegistrationProgram
         catch (WebException error)
         {
             HttpWebResponse response = error.Response as HttpWebResponse;
-            if (response != null) { message = "That email is not registered. Register free or sign in at license.authoritygate.com, then enter the same email here."; return false; }
+            if (response != null) { message = "Registration could not be recorded. Check the email address and try again, or choose Not now to continue."; return false; }
             SaveForRetry(email, company); message = "Registration was saved. ShellColors will confirm it automatically when a connection is available."; return true;
         }
         catch { SaveForRetry(email, company); message = "Registration was saved. ShellColors will confirm it automatically when a connection is available."; return true; }
@@ -82,7 +82,7 @@ internal static class RegistrationProgram
     private static void CheckIn(string email, string company, string startingVersion, string eventName, bool requireSuccess)
     {
         ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-        string json = "{\"email\":\"" + Escape(email.Trim()) + "\",\"registration_name\":\"" + Escape(company.Trim()) + "\"" +
+        string json = "{\"email\":\"" + Escape(email.Trim()) + "\",\"registration_name\":\"" + Escape(company.Trim()) +
             "\",\"product\":\"cmdhelp\",\"computer_name\":\"" + Escape(Environment.MachineName) + "\",\"starting_version\":\"" +
             Escape(String.IsNullOrEmpty(startingVersion) ? Version : startingVersion) + "\",\"current_version\":\"" + Version + "\",\"event\":\"" + eventName + "\"}";
         byte[] body = Encoding.UTF8.GetBytes(json);
